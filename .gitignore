@@ -18,3 +18,10 @@ venv.bak/
 
 # VSCode
 .vscode
+
+# C extensions
+*.so
+
+#Developer
+app.db
+microblog.log*
