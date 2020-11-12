@@ -6,13 +6,13 @@ from app.main.forms import EditProfileForm, PostForm, EmptyForm
 from app.models import User, Post
 from app.main import bp
 
-@main.before_request
+@bp.before_app_request
 def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
-@main.route('/edit_profile', methods=['GET', 'POST'])
+@bp.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     form = EditProfileForm(current_user.username)
@@ -27,7 +27,7 @@ def edit_profile():
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
 
-@main.route('/user/<username>')
+@bp.route('/user/<username>')
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
@@ -42,7 +42,7 @@ def user(username):
     return render_template('user.html', user=user, posts=posts.items,
                         next_url=next_url, prev_url=prev_url, form=form)
 
-@main.route('/follow/<username>', methods=['POST'])
+@bp.route('/follow/<username>', methods=['POST'])
 @login_required
 def follow(username):
     form = EmptyForm()
@@ -61,7 +61,7 @@ def follow(username):
     else:
         return redirect(url_for('main.index'))
 
-@main.route('/unfollow/<username>', methods=['POST'])
+@bp.route('/unfollow/<username>', methods=['POST'])
 @login_required
 def unfollow(username):
     form = EmptyForm()
@@ -80,8 +80,8 @@ def unfollow(username):
     else:
         return redirect(url_for('main.index'))
 
-@main.route('/', methods=['GET', 'POST'])
-@main.route('/index', methods=['GET', 'POST'])
+@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
     form = PostForm()
@@ -102,7 +102,7 @@ def index():
                         posts=posts.items, next_url=next_url,
                         prev_url=prev_url)
 
-@main.route('/explore')
+@bp.route('/explore')
 @login_required
 def explore():
     page = request.args.get('page', 1, type=int)
